@@ -7,7 +7,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // middleware betn req and res
-app.use(morgan('dev'));
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'production') {
+    app.use(morgan('dev'));
+}
 
 app.use(express.json());
 
