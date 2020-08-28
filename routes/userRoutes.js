@@ -1,5 +1,5 @@
 const express = require('express');
-const userHandler = require('../routeHandlers/userHandler');
+const userHandler = require('../controllers/userController');
 
 const {
     getAllUsers,
