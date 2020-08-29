@@ -2,7 +2,32 @@ const Tour = require('../model/tourModel');
 
 exports.getAllTours = async (req, res) => {
     try {
-        const tours = await Tour.find();
+        // BUILD QUERY
+        // 1) Filtering
+        const queryObj = {
+            ...req.query
+        };
+        // console.log(queryObj);
+        // http://localhost:3000/api/v1/tours?difficulty=easy&ratingsAverage=4.5&sort=3&page=2
+        const excludedFields = ['page', 'sort', 'limit', 'fields'];
+        excludedFields.forEach(el => delete queryObj[el]); // it will delete all excludedFields from params
+        //only shows this in req.query { difficulty: 'easy', ratingsAverage: '4.5' } these excepts the excluded fields
+
+        // 2) Advanced filtering
+        let queryStr = JSON.stringify(queryObj); //{ "difficulty": "easy", "ratingsAverage": "4.5" }
+        // queryStr = '{ "averageCost": { "lt": "10000" }, "test": { "gt": "12345"} }';
+        const regex = /\b(gt|gte|lt|lte)\b/g;
+        queryStr = queryStr.replace(regex, '$$' + "$1");
+        // console.log(JSON.parse(queryStr));
+        queryStr = JSON.parse(queryStr);
+
+        const query = Tour.find(queryStr); // if we use await in this query we willnot be able to use the filter query
+        // const query = Tour.find().where('duration).equals(5).where('difficulty').equals('easy')
+
+        // EXECUTE QUERY
+        const tours = await query;
+
+        // SEND RESPONSE
         res.status(200).json({
             status: 'success',
             results: tours.length,
