@@ -7,10 +7,13 @@ const {
     createTour,
     getTourById,
     updateTour,
-    deleteTour
+    deleteTour,
+    aliasTopTours
 } = tourController;
 
 const router = express.Router();
+
+router.route('/top-5-cheapTours').get(aliasTopTours, getAllTours);
 
 router.route('/').get(getAllTours).post(createTour);
 
