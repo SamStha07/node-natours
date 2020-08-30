@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const tourController = require('../controllers/tourController');
 
 const {
@@ -8,10 +7,13 @@ const {
     getTourById,
     updateTour,
     deleteTour,
-    aliasTopTours
+    aliasTopTours,
+    getTourStats
 } = tourController;
 
 const router = express.Router();
+
+router.route('/tour-stats').get(getTourStats);
 
 router.route('/top-5-cheapTours').get(aliasTopTours, getAllTours);
 

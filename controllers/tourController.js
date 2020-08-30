@@ -109,3 +109,67 @@ exports.deleteTour = async (req, res) => {
         });
     }
 };
+
+// aggregate means it will check all Tours checks/$match ratingsAverage=4.5 and calculates all the $group queries
+exports.getTourStats = async (req, res) => {
+    try {
+        const stats = await Tour.aggregate([{
+                $match: {
+                    ratingsAverage: {
+                        $gte: 4.5
+                    }
+                }
+            },
+            {
+                $group: {
+                    // _id: '$difficulty',
+                    _id: {
+                        $toUpper: '$difficulty' // will shows with the difficulty level as medium, difficult & easy
+                    },
+                    // _id: '$ratingsAverage', //show will the average ratings category
+                    numRatings: {
+                        $sum: '$ratingsQuantity' //all ratings given by users to all Tours
+                    },
+                    numTours: {
+                        $sum: 1 // total no of tours in DB
+                    },
+                    avgRating: {
+                        $avg: '$ratingsAverage'
+                    },
+                    avgPrice: {
+                        $avg: '$price'
+                    },
+                    minPrice: {
+                        $min: '$price'
+                    },
+                    maxPrice: {
+                        $max: '$price'
+                    }
+                }
+            },
+            {
+                $sort: {
+                    avgPrice: 1 //-1
+                }
+            },
+            // {
+            //     $match: {
+            //         _id: {
+            //             $ne: 'EASY' // ne = not equal and excludes EASY must match the UPPERCASE level from $group _id which is in uppercase
+            //         }
+            //     }
+            // }
+        ]);
+        res.status(200).json({
+            status: 'success',
+            data: {
+                stats
+            }
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err
+        });
+    }
+}
