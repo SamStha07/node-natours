@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const router = require('../routes/tourRoutes');
 
 const tourSchema = new mongoose.Schema({
     name: {
@@ -53,7 +54,21 @@ const tourSchema = new mongoose.Schema({
         select: false // not to show the data created date for the user
     },
     startDates: [Date],
+}, {
+    toJSON: {
+        virtuals: true
+    },
+    toObject: {
+        virtuals: true
+    }
 });
+
+// to show this virtual we have add objects in line 58
+// also this part is not the part of DB
+tourSchema.virtual('durationWeeks').get(function () {
+    return this.duration / 7;
+});
+// shows as "durationWeeks": this.duration/7
 
 const Tour = mongoose.model('Tour', tourSchema);
 
