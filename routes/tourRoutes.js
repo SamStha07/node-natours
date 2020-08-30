@@ -2,14 +2,14 @@ const express = require('express');
 const tourController = require('../controllers/tourController');
 
 const {
-    getAllTours,
-    createTour,
-    getTourById,
-    updateTour,
-    deleteTour,
-    aliasTopTours,
-    getTourStats,
-    getMonthlyPlan
+  getAllTours,
+  createTour,
+  getTourById,
+  updateTour,
+  deleteTour,
+  aliasTopTours,
+  getTourStats,
+  getMonthlyPlan,
 } = tourController;
 
 const router = express.Router();

@@ -56,6 +56,10 @@ const tourSchema = new mongoose.Schema(
       select: false, // not to show the data created date for the user
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: {
@@ -74,7 +78,8 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 // shows as "durationWeeks": this.duration/7
 
-// DOCUMENT MIDDLEWARE from mongoose: runs before .save() and .create()
+// MIDDLEWARES
+// DOCUMENT MIDDLEWARE from mongoose: runs before .save() and .create() -- for Model
 tourSchema.pre('save', function () {
   // this creates the url path
   this.slug = slugify(this.name, { lower: true });
@@ -89,6 +94,30 @@ tourSchema.pre('save', function () {
 //   console.log(doc);
 //   next();
 // });
+
+// QUERY MIDDLEWARE -- for tourController queries like CRUD
+// hides the {secretTour: true} from the db and in queries
+// find query == Tour.find() from getAllTours
+// /^find/ = works on every starting from find
+// tourSchema.pre('find', function (next) {
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  this.start = Date.now();
+  next();
+});
+// runs after tourSchema.pre()
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+  //   console.log(docs);
+  next();
+});
+
+// AGGREGATION MIDDLEWARE --- for tourController like aggregate pipeline
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  console.log(this.pipeline());
+  next();
+});
 
 const Tour = mongoose.model('Tour', tourSchema);
 
