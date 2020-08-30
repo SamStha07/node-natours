@@ -173,3 +173,69 @@ exports.getTourStats = async (req, res) => {
         });
     }
 }
+
+// business plan
+// monthly tours count to make available the tour guides required as per month
+exports.getMonthlyPlan = async (req, res) => {
+    try {
+        const year = req.params.year * 1; // 2021
+        const plan = await Tour.aggregate([{
+                $unwind: '$startDates',
+            },
+            {
+                $match: {
+                    startDates: {
+                        $gte: new Date(`${year}-01-01`),
+                        $lte: new Date(`${year}-12-31`),
+                    }
+                }
+            },
+            {
+                $group: {
+                    // we only need month not other fields
+                    _id: {
+                        $month: '$startDates'
+                    },
+                    // no of tours in a month
+                    numTourStarts: {
+                        $sum: 1
+                    },
+                    // name of the tours in a month
+                    tours: {
+                        $push: '$name'
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    month: '$_id'
+                }
+            },
+            {
+                $project: {
+                    _id: 0 // removes _id from $group
+                }
+            },
+            {
+                $sort: {
+                    // numTourStarts: -1,  //shows the higher tours in a month in descending order
+                    month: 1 // starts from 1
+                }
+            },
+            // {
+            //     $limit: 12 // show only 12 tours similar to limit query
+            // }
+        ]);
+        res.status(200).json({
+            status: 'success',
+            data: {
+                plan
+            }
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err
+        });
+    }
+}

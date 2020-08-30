@@ -8,12 +8,14 @@ const {
     updateTour,
     deleteTour,
     aliasTopTours,
-    getTourStats
+    getTourStats,
+    getMonthlyPlan
 } = tourController;
 
 const router = express.Router();
 
 router.route('/tour-stats').get(getTourStats);
+router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 router.route('/top-5-cheapTours').get(aliasTopTours, getAllTours);
 
