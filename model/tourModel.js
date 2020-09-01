@@ -45,6 +45,7 @@ const tourSchema = new mongoose.Schema({
     priceDiscount: {
         type: Number,
         validate: {
+            // this will only work on CREATE or SAVE when we create a new tour
             validator: function (val) {
                 return val < this.price;
             },
@@ -94,7 +95,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 // MIDDLEWARES
 // DOCUMENT MIDDLEWARE from mongoose: runs before .save() and .create() -- for Model
-tourSchema.pre('save', function () {
+tourSchema.pre('save', function (next) {
     // this creates the url path
     this.slug = slugify(this.name, {
         lower: true
