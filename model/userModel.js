@@ -32,7 +32,9 @@ const userSchema = new mongoose.Schema({
             message: 'Passwords are not the same!',
         },
     },
+    passwordChangedAt: Date,
 });
+// here "this" represents inside the current document
 
 // MIDDLEWARES
 // DOCUMENT MIDDLEWARE from mongoose: runs before .save() or .create()
@@ -51,6 +53,17 @@ userSchema.methods.correctPassword = async function (candidatePassword, userPass
     // candidatePassword = original password which isnot hashed coming from user
     // userPassword = is hashed
     return await bcrypt.compare(candidatePassword, userPassword); // it returns true or false
+};
+
+// changed password sometime after logged in
+userSchema.methods.changedPasswordAfter = async function (JWTTimeStamp) {
+    if (this.passwordChangedAt) {
+        const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+        // console.log(changedTimeStamp, JWTTimeStamp);
+        return JWTTimeStamp < changedTimeStamp; //JWTTimeStamp = token issued, changedTimeStamp = password changed time return true
+    }
+    // False means Not changed
+    return false;
 }
 
 const User = mongoose.model('User', userSchema);
