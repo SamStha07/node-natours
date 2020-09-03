@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
         validate: [validator.isEmail, 'Please provide a valid email'],
     },
     photo: String,
+    role: {
+        type: String,
+        enum: ['user', 'admin', 'guide', 'lead-guide'],
+        default: 'user' // default value isnot overwriting have to manually change the role in db
+    },
     password: {
         type: String,
         required: [true, 'Please provide a password'],
@@ -59,8 +64,8 @@ userSchema.methods.correctPassword = async function (candidatePassword, userPass
 userSchema.methods.changedPasswordAfter = async function (JWTTimeStamp) {
     if (this.passwordChangedAt) {
         const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
-        // console.log(changedTimeStamp, JWTTimeStamp);
-        return JWTTimeStamp < changedTimeStamp; //JWTTimeStamp = token issued, changedTimeStamp = password changed time return true
+        console.log(changedTimeStamp, JWTTimeStamp);
+        return JWTTimeStamp < changedTimeStamp; //JWTTimeStamp = token issued, changedTimeStamp = password changed after signup, return true
     }
     // False means Not changed
     return false;

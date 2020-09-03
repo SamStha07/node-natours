@@ -11,7 +11,8 @@ const {
   getMonthlyPlan,
 } = tourController;
 const {
-  protect
+  protect,
+  restrictTo
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -23,6 +24,6 @@ router.route('/top-5-cheapTours').get(aliasTopTours, getAllTours);
 
 router.route('/').get(protect, getAllTours).post(createTour);
 
-router.route('/:id').get(getTourById).patch(updateTour).delete(deleteTour);
+router.route('/:id').get(getTourById).patch(updateTour).delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 module.exports = router;
