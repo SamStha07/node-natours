@@ -8,13 +8,27 @@ const {
   getOneUser,
   updateUser,
   deleteUser,
+  updateMe,
+  deleteMe,
 } = userController;
-const { signup, login } = authController;
+const {
+  signup,
+  login,
+  forgotPassword,
+  resetPassword,
+  protect,
+} = authController;
 
 const router = express.Router();
 
 router.post('/signup', signup);
 router.post('/login', login);
+
+router.patch('/updateMe', protect, updateMe);
+router.delete('/deleteMe', protect, deleteMe);
+
+router.post('/forgotPassword', forgotPassword);
+router.patch('/resetPassword/:token', resetPassword);
 
 router.route('/').get(getAllUsers).post(createUser);
 

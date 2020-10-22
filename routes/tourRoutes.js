@@ -12,7 +12,9 @@ const {
 } = tourController;
 const {
   protect,
-  restrictTo
+  restrictTo,
+  forgotPassword,
+  resetPassword,
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -24,6 +26,10 @@ router.route('/top-5-cheapTours').get(aliasTopTours, getAllTours);
 
 router.route('/').get(protect, getAllTours).post(createTour);
 
-router.route('/:id').get(getTourById).patch(updateTour).delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
+router
+  .route('/:id')
+  .get(getTourById)
+  .patch(updateTour)
+  .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour);
 
 module.exports = router;
